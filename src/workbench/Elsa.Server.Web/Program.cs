@@ -10,6 +10,7 @@ using Elsa.Expressions.Helpers;
 using Elsa.Extensions;
 using Elsa.Features.Services;
 using Elsa.Identity.Multitenancy;
+using Elsa.Mqtt.Options;
 using Elsa.OpenTelemetry.Middleware;
 using Elsa.Persistence.Dapper.Extensions;
 using Elsa.Persistence.Dapper.Contracts;
@@ -441,6 +442,17 @@ services
                 };
             })
             .UseEmail(email => email.ConfigureOptions = options => configuration.GetSection("Smtp").Bind(options))
+            .UseMqtt(mqtt =>
+            {
+                mqtt.ConfigureOptions = options =>
+                {
+                    options.AddDefaultConnection(new MqttConnectionOptions
+                    {
+                        Host = "localhost",
+                        Port = 1883,
+                    });
+                };
+            })
             .UseAlterations(alterations =>
             {
                 if (persistenceProvider == PersistenceProvider.MongoDb)
